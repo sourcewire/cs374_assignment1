@@ -131,7 +131,32 @@ void printMovieList(struct movie *list)
         list = list->next;
     }
 }
+/* function for user to pick how they would like to parse data
+    returns the number they choose*/
+int userChoice()
+{
+    int userNum;//variable to store user number
 
+    //show user options
+    printf("1. Show movies released in the specified year\n");
+    printf("2. Show highest rated movie for each year\n");
+    printf("3. Show the title and year of release of all movies in a specific language\n");
+    printf("4. Exit from the program\n");
+
+    printf("Choose an option from 1-4: ");
+    scanf("%d", &userNum);
+    printf("%d\n", userNum);
+    return userNum;
+}
+//function for user interaction
+void returnData(int userNum)
+{
+    //display user options for viewing data
+    printf("Your chosen number is: %d\n", userNum);
+}
+
+/*Process the file provided as an argument to the program to
+*   create a linked list of movie structs and print out the list....*/
 int main(int argc, char *argv[])
 {
     if (argc < 2)
@@ -140,9 +165,13 @@ int main(int argc, char *argv[])
         printf("Example usage: ./movies movies_sample_1.csv\n");
         return 1;
     }
+    //printf("Processed file", argv[1], "and parsed data for", "movies");
     printf("hi im compiling\n");
     struct movie *list = processFile(argv[1]);
-    printMovieList(list);
+    //printMovieList(list);
+    //userChoice();
+    int num = userChoice();
+    returnData(num);
     
 
     return 0;
