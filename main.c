@@ -131,29 +131,52 @@ void printMovieList(struct movie *list)
         list = list->next;
     }
 }
-/* function for user to pick how they would like to parse data
-    returns the number they choose*/
-int userChoice()
-{
-    int userNum;//variable to store user number
 
+//function for printing user questions
+void askQuestions()
+{
     //show user options
     printf("1. Show movies released in the specified year\n");
     printf("2. Show highest rated movie for each year\n");
     printf("3. Show the title and year of release of all movies in a specific language\n");
     printf("4. Exit from the program\n");
+}
 
+/* function for for returning user requested data*/
+int userChoice()
+{
+    askQuestions();
+    int userNum;//variable to store user number
     printf("Choose an option from 1-4: ");
     scanf("%d", &userNum);
-    printf("%d\n", userNum);
-    return userNum;
+    while(userNum < 4)
+    {
+        if(userNum == 1)
+        {
+            int year;
+            printf("Enter the year you would like to search for movies: ");
+            scanf("%d", &year);
+            printf("%d", year);
+        }
+        if(userNum == 2)
+        {
+
+        }
+        if(userNum == 3)
+        {
+            char* language;
+            printf("Enter the language for which you want to see movies: ");
+            scanf("%s", language);
+            printf("%s", language);
+
+        }
+    }
+
+    printf("Have a nice day!\n");
+    return 1;
+    
 }
-//function for user interaction
-void returnData(int userNum)
-{
-    //display user options for viewing data
-    printf("Your chosen number is: %d\n", userNum);
-}
+
 
 /*Process the file provided as an argument to the program to
 *   create a linked list of movie structs and print out the list....*/
@@ -166,12 +189,11 @@ int main(int argc, char *argv[])
         return 1;
     }
     //printf("Processed file", argv[1], "and parsed data for", "movies");
-    printf("hi im compiling\n");
+    //printf("hi im compiling\n");
     struct movie *list = processFile(argv[1]);
-    //printMovieList(list);
-    //userChoice();
-    int num = userChoice();
-    returnData(num);
+    userChoice();
+    
+    
     
 
     return 0;
