@@ -67,6 +67,7 @@ struct movie *createMovie(char* currLine)//take currLine string as input and ret
 
 }
 
+int count = -1;// set global variable count to count lines in the file
 /*return linked list of movies by parsing data from each line
 of the file*/
 struct movie *processFile(char* filePath)
@@ -89,6 +90,7 @@ struct movie *processFile(char* filePath)
     {
         //get a new movie node corresponding to the current line
         struct movie *newNode = createMovie(currLine);
+        count = count + 1;//add 1 for each line in the file
 
         //if this is the first node...
         if (head == NULL)
@@ -103,9 +105,9 @@ struct movie *processFile(char* filePath)
             //add this node to list and advance the tail
             tail->next = newNode;
             tail = newNode;
-
         }
     }
+
     free(currLine);
     fclose(movieFile);
     return head;
@@ -123,7 +125,7 @@ void printMovie(struct movie* aMovie)
 }
 
 //print the linked list of movies
-void printMovieList(struct movie *list)
+void printMovieList(struct movie *list)//*list is a pointer to the first node in the linked list
 {
     while (list != NULL)
     {
@@ -132,31 +134,79 @@ void printMovieList(struct movie *list)
     }
 }
 
+//print a movie title
+void printMovieTitle(struct movie* aMovie)
+{
+    printf("%s, \n", aMovie->title);
+}
+
+//print all movies that match the users year
+//help from chat gpt with the found flag
+void printTitleList(struct movie *list, int year)
+{
+    int found = 0;//flag to indicate if match was found
+    while(list != NULL)
+    {
+        if(list->year == year)
+        {
+        printMovieTitle(list);
+        found = 1;//movie was found
+        } 
+
+        list = list->next;
+    }
+    if(!found)
+    {
+        printf("No movies were made in this year\n");
+
+    }
+}
+
+//function for printing info based on user chosen language
+void choseLang(struct movie *list, char* language)
+{
+    while(list != NULL)
+    {
+        if(list->languages == language)
+        {
+            printf("%s, %d\n", list->title, list->year);
+        }
+        list = list->next;
+    }
+}
+
 //function for printing user questions
 void askQuestions()
 {
     //show user options
+    printf("\n");
     printf("1. Show movies released in the specified year\n");
     printf("2. Show highest rated movie for each year\n");
     printf("3. Show the title and year of release of all movies in a specific language\n");
-    printf("4. Exit from the program\n");
+    printf("4. Exit from the program\n\n");
 }
 
 /* function for for returning user requested data*/
-int userChoice()
+int userChoice(struct movie *list)
 {
     askQuestions();
     int userNum;//variable to store user number
     printf("Choose an option from 1-4: ");
-    scanf("%d", &userNum);
-    while(userNum < 4)
+    scanf("%d", &userNum);//save user numner in userNum
+    while(userNum <= 4)
     {
         if(userNum == 1)
         {
             int year;
             printf("Enter the year you would like to search for movies: ");
             scanf("%d", &year);
-            printf("%d", year);
+           
+            /*call printTitleList with the LL head and user chosen year to return
+            all movies made in that year, and error message if none found*/
+            printTitleList(list, year);
+            askQuestions();//ask questions again
+            printf("Choose an option from 1-4: ");
+            scanf("%d", &userNum);//get user num and continue in loop
         }
         if(userNum == 2)
         {
@@ -167,14 +217,16 @@ int userChoice()
             char* language;
             printf("Enter the language for which you want to see movies: ");
             scanf("%s", language);
-            printf("%s", language);
+            //printf("%s", language);
+            choseLang(list, language);
 
         }
+        if(userNum == 4)
+        {
+            printf("Have a nice day!\n");
+            return 1;
+        }
     }
-
-    printf("Have a nice day!\n");
-    return 1;
-    
 }
 
 
@@ -188,10 +240,15 @@ int main(int argc, char *argv[])
         printf("Example usage: ./movies movies_sample_1.csv\n");
         return 1;
     }
-    //printf("Processed file", argv[1], "and parsed data for", "movies");
-    //printf("hi im compiling\n");
+
     struct movie *list = processFile(argv[1]);
-    userChoice();
+    char* fileName = argv[1];
+    //printMovieList(list);
+    printf("Processed file %s and parsed data for %d movies.\n\n", fileName, count );
+    //printf("hi im compiling\n");
+    //printTitleList(list);
+   
+    userChoice(list);
     
     
     
