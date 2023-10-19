@@ -23,8 +23,12 @@ struct movie *createMovie(char* currLine)//take currLine string as input and ret
 
     //the first token is the title
     char* token = strtok_r(currLine, ",", &saveptr);
+    //token[strlen(token)-1] = "\0";
+    //printf("%d", token[0]);
     currMovie->title = calloc(strlen(token) + 1, sizeof(char));
     strcpy(currMovie->title, token);//copy title from token to struct
+    
+
 
     //second token is the year
     //help from chat gpt
@@ -44,6 +48,7 @@ struct movie *createMovie(char* currLine)//take currLine string as input and ret
     token = strtok_r(NULL, ",", &saveptr);
     currMovie->languages = calloc(strlen(token) + 1, sizeof(char));
     strcpy(currMovie->languages, token);//is a list, will need to edit
+    //puts(currMovie->languages);
 
     //the last token is the rating value
     //help from chat gpt
@@ -167,11 +172,73 @@ void choseLang(struct movie *list, char* language)
 {
     while(list != NULL)
     {
-        if(list->languages == language)
+        /*returns null if language is not present in list->languages
+        prints language is it is present*/
+        if (strstr(list->languages, language ) != NULL)//if it is null, return language
         {
-            printf("%s, %d\n", list->title, list->year);
+            printf("%s, %d\n", list->title, list->year);// print the language
+
+        }
+        
+        list = list->next;
+        
+    }
+}
+
+void highestRating(struct movie *list)
+{
+    struct movie* movieArr[count];//array the size of all nodes
+    //struct movie m = malloc(sizeof(struct movie));
+    //struct movie* m_ptr = malloc(sizeof(struct movie*));
+    //m_ptr = &m;
+    
+    //struct movie *temp = createMovie("temp,0,language,0.0");//temporary struct for placeholder
+    struct movie m;
+    struct movie* mov = &m;
+    mov->year = 0;
+    mov->title = "title";
+    mov->languages = "lang";
+    mov->rating_value = 0.0;
+    for(int i = 0; i < count; i++)
+    {
+        movieArr[i] = mov;
+    }
+
+    
+    while(list != NULL)// traverse through the whloe list//what movie wre looking at
+    {
+        for(int i = 0; i < count; i++){//loop through the movie temp array//index in array
+            
+            if(list->year == movieArr[i]->year)//is the year in the linked list is the same as the year in the movie array
+            {
+                if(list->rating_value > movieArr[i]->rating_value)//if the lists rating value is greater than the movies rating value
+                {
+                    movieArr[i]->rating_value = list->rating_value;//add the lists rating value to the movie array
+                   // break;//break out of for loop and move onto next link in the ll
+                } 
+                break;
+            }
+            else if(movieArr[i]->year == 0)//if position is a placeholder(0) and not above
+            {
+                movieArr[i] = list;//add that movie to the array
+                break;
+            }
+            else if(list->year != movieArr[i]->year)//move onto next indice in array
+            {
+                continue;
+            }
         }
         list = list->next;
+    }
+
+    for(int i = 0; i < count; i++)
+    {
+        //add if statement for only values with non NULL values in struct
+        if(movieArr[i]->year != 0)
+        {
+        printf("%d %.1f %s\n", movieArr[i]->year, movieArr[i]->rating_value, movieArr[i]->title);
+        }
+
     }
 }
 
@@ -189,12 +256,15 @@ void askQuestions()
 /* function for for returning user requested data*/
 int userChoice(struct movie *list)
 {
-    askQuestions();
+    int loop = 1;
+    
     int userNum;//variable to store user number
-    printf("Choose an option from 1-4: ");
-    scanf("%d", &userNum);//save user numner in userNum
-    while(userNum <= 4)
+    
+    while(loop == 1)
     {
+        askQuestions();//ask questions again
+        printf("Choose an option from 1-4: ");
+        scanf("%d", &userNum);//get user num and continue in loop
         if(userNum == 1)
         {
             int year;
@@ -204,27 +274,30 @@ int userChoice(struct movie *list)
             /*call printTitleList with the LL head and user chosen year to return
             all movies made in that year, and error message if none found*/
             printTitleList(list, year);
-            askQuestions();//ask questions again
-            printf("Choose an option from 1-4: ");
-            scanf("%d", &userNum);//get user num and continue in loop
+            
         }
-        if(userNum == 2)
+        else if(userNum == 2)
         {
-
+            highestRating(list);
         }
-        if(userNum == 3)
+        else if(userNum == 3)
         {
             char* language;
             printf("Enter the language for which you want to see movies: ");
             scanf("%s", language);
             //printf("%s", language);
             choseLang(list, language);
+           
 
         }
-        if(userNum == 4)
+        else if(userNum == 4)
         {
             printf("Have a nice day!\n");
             return 1;
+        }
+        else
+        {
+            printf("please enter a number from 1-4");
         }
     }
 }
